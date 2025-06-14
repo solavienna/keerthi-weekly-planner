@@ -1,0 +1,209 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Keerthi’s Weekly Peace & Power Plan</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Italiana&family=Quicksand&family=Cherry+Swash&family=Handlee&family=Cabin+Sketch&display=swap');
+
+    body {
+      font-family: 'Handlee', cursive;
+      background-color: #f8f3f0;
+      background-image: radial-gradient(circle at 20px 20px, #5c3a2b 1px, transparent 0),
+                        radial-gradient(circle at 60px 60px, #5c3a2b 1px, transparent 0);
+      background-size: 80px 80px;
+      background-repeat: repeat;
+      color: #4a2c22;
+      padding: 30px;
+      max-width: 750px;
+      margin: auto;
+      border-radius: 20px;
+      box-shadow: 0 0 18px rgba(0, 0, 0, 0.15);
+      position: relative;
+    }
+
+    h1 {
+      text-align: center;
+      color: #5e3a2c;
+      font-family: 'Cabin Sketch', cursive;
+      margin-bottom: 20px;
+      font-size: 2.2em;
+    }
+
+    .day-title {
+      color: #59362c;
+      margin-top: 30px;
+      text-align: left;
+      font-size: 1.6em;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      font-family: 'Cabin Sketch', cursive;
+    }
+
+    .day-title::before {
+      content: "🍂 ";
+      margin-right: 8px;
+    }
+
+    .task-list {
+      list-style: none;
+      padding: 0;
+      margin-top: 15px;
+    }
+
+    .task-item {
+      display: flex;
+      align-items: flex-start;
+      padding: 12px 15px;
+      margin-bottom: 12px;
+      background-color: #fffaf7;
+      border-left: 6px solid #caa892;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      font-size: 1.1em;
+    }
+
+    .task-item input[type="checkbox"] {
+      margin-right: 15px;
+      transform: scale(1.4);
+      margin-top: 3px;
+    }
+
+    .popup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #fff1ec;
+      padding: 40px;
+      border-radius: 18px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+      z-index: 1000;
+      text-align: center;
+      font-size: 28px;
+      font-weight: bold;
+      color: #7b3f2f;
+      animation: popUp 0.6s ease-in-out;
+      border: 4px dashed #d1a88f;
+      font-family: 'Cherry Swash', cursive;
+    }
+
+    .popup.visible {
+      display: block;
+    }
+
+    @keyframes popUp {
+      0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+      100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    }
+
+    .confetti {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 999;
+    }
+  </style>
+</head>
+<body>
+  <h1>🐻 Keerthi’s Weekly Peace & Power Plan</h1>
+  <div id="planner"></div>
+  <div id="popup" class="popup">🎉 Hurray! You did it! 🎉</div>
+  <canvas id="confetti" class="confetti"></canvas>
+  <audio id="celebration-sound" src="https://www.fesliyanstudios.com/play-mp3/387" preload="auto"></audio>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script>
+    const weekPlan = {
+      Monday: [
+        "Journal prompt: 'What do I want to leave behind this week?'",
+        "10-minute grounding meditation",
+        "Hydrate + eat one nourishing meal mindfully"
+      ],
+      Tuesday: [
+        "Watch/read something inspiring",
+        "Learn or revisit a coding concept",
+        "Play a calming/healing playlist while walking/stretching"
+      ],
+      Wednesday: [
+        "Draw, journal, or design something that expresses your mood",
+        "Journal prompt: 'What am I holding in that needs release?'",
+        "Talk to someone who makes you feel safe and heard"
+      ],
+      Thursday: [
+        "Say 'no' to one thing that drains you",
+        "List 3 things you will not tolerate anymore",
+        "Affirmation: 'My energy is precious. I choose where it goes.'"
+      ],
+      Friday: [
+        "Watch something that makes you laugh",
+        "Dance to your 'I’m a Queen' playlist",
+        "Treat yourself to your fave food or snack"
+      ],
+      Saturday: [
+        "Get outside (even a terrace or a walk counts)",
+        "Unplug from social media for 2–3 hours",
+        "Journal prompt: 'What’s something I love about myself lately?'"
+      ],
+      Sunday: [
+        "Do something relaxing (skincare, long bath, candles)",
+        "Write 3 wins from this past week",
+        "Plan 3 gentle goals for Monday"
+      ]
+    };
+
+    const today = new Date().toLocaleDateString('en-US', { weekday: 'long' });
+    const plannerDiv = document.getElementById('planner');
+
+    const dayTitle = document.createElement('div');
+    dayTitle.className = 'day-title';
+    dayTitle.textContent = today + ' — Your Daily Plan';
+    plannerDiv.appendChild(dayTitle);
+
+    const ul = document.createElement('ul');
+    ul.className = 'task-list';
+
+    (weekPlan[today] || []).forEach(task => {
+      const li = document.createElement('li');
+      li.className = 'task-item';
+
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.addEventListener('change', checkCompletion);
+
+      const text = document.createElement('span');
+      text.textContent = task;
+
+      li.appendChild(checkbox);
+      li.appendChild(text);
+      ul.appendChild(li);
+    });
+
+    plannerDiv.appendChild(ul);
+
+    function checkCompletion() {
+      const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+      const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+      const popup = document.getElementById('popup');
+      const confettiCanvas = document.getElementById('confetti');
+      const sound = document.getElementById('celebration-sound');
+
+      if (allChecked) {
+        popup.classList.add('visible');
+        sound.play();
+        const myConfetti = confetti.create(confettiCanvas, { resize: true });
+        myConfetti({ particleCount: 200, spread: 100 });
+      } else {
+        popup.classList.remove('visible');
+      }
+    }
+  </script>
+</body>
+</html>
